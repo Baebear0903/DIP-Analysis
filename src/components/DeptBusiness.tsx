@@ -233,8 +233,8 @@ export function DeptBusiness() {
           <Table 
             pagination={true}
             pageSize={10}
-            headers={['出院科室', '收治排名', '总人次', '同比增长', '业务人次占比（%）', '总费用（万元）', '同比增长', '次均费用（万元）', '同比增长', '记账费用（万元）', '总分值', '次均分值', '同比增长', '操作']}
-            rows={filteredRows.map(row => [...row, <button className="text-blue-600 hover:text-blue-800 font-medium">分析</button>])}
+            headers={['出院科室', '收治排名', '总人次', '同比增长', '业务人次占比（%）', '总费用（万元）', '同比增长', '次均费用（万元）', '同比增长', '记账费用（万元）', '总分值', '次均分值', '同比增长']}
+            rows={filteredRows}
           />
         </div>
       </Card>
