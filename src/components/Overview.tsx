@@ -432,10 +432,10 @@ export function Overview() {
   };
 
   const currentScatterData = getScatterData();
-  const advantages = currentScatterData.filter(d => d.y > 1.1 && d.x > 0);
-  const potentials = currentScatterData.filter(d => d.y > 1.1 && d.x < 0);
-  const disadvantages = currentScatterData.filter(d => d.y < 1.1 && d.x < 0);
-  const focuses = currentScatterData.filter(d => d.y < 1.1 && d.x > 0);
+  const advantages = currentScatterData.filter(d => d.y > 1.0 && d.x > 0);
+  const potentials = currentScatterData.filter(d => d.y > 1.0 && d.x < 0);
+  const disadvantages = currentScatterData.filter(d => d.y < 1.0 && d.x < 0);
+  const focuses = currentScatterData.filter(d => d.y < 1.0 && d.x > 0);
 
   return (
     <div className="space-y-10">
@@ -596,13 +596,13 @@ export function Overview() {
           </div>
         </div>
         <div className="mt-6">
-          <ScatterChart data={currentScatterData} xLabel="测算结余" yLabel="CMI" xUnit="元" xReference={0} yReference={1.1} />
+          <ScatterChart data={currentScatterData} xLabel="测算结余" yLabel="CMI" xUnit="元" xReference={0} yReference={1.0} />
         </div>
         <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-emerald-50/50 border border-emerald-100 rounded-lg p-4">
             <h5 className="font-semibold text-emerald-800 mb-3 flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-500" />
-              优势 (CMI &gt; 1.1, 结余 &gt; 0)
+              优势 (CMI &gt; 1.0, 结余 &gt; 0)
             </h5>
             <ul className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
               {advantages.length > 0 ? advantages.map((d, i) => (
@@ -613,7 +613,7 @@ export function Overview() {
           <div className="bg-blue-50/50 border border-blue-100 rounded-lg p-4">
             <h5 className="font-semibold text-blue-800 mb-3 flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-blue-500" />
-              潜力 (CMI &gt; 1.1, 结余 &lt; 0)
+              潜力 (CMI &gt; 1.0, 结余 &lt; 0)
             </h5>
             <ul className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
               {potentials.length > 0 ? potentials.map((d, i) => (
@@ -624,7 +624,7 @@ export function Overview() {
           <div className="bg-amber-50/50 border border-amber-100 rounded-lg p-4">
             <h5 className="font-semibold text-amber-800 mb-3 flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-amber-500" />
-              关注 (CMI &lt; 1.1, 结余 &gt; 0)
+              关注 (CMI &lt; 1.0, 结余 &gt; 0)
             </h5>
             <ul className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
               {focuses.length > 0 ? focuses.map((d, i) => (
@@ -635,7 +635,7 @@ export function Overview() {
           <div className="bg-rose-50/50 border border-rose-100 rounded-lg p-4">
             <h5 className="font-semibold text-rose-800 mb-3 flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-rose-500" />
-              劣势 (CMI &lt; 1.1, 结余 &lt; 0)
+              劣势 (CMI &lt; 1.0, 结余 &lt; 0)
             </h5>
             <ul className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
               {disadvantages.length > 0 ? disadvantages.map((d, i) => (
