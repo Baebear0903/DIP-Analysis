@@ -206,10 +206,11 @@ export function DeptBusiness() {
       </Card>
 
       <Card>
-        <CardTitle>业务整体情况</CardTitle>
-        <div className="mt-6">
-          <Table 
-            pagination={false}
+        <Table 
+          title={<h3 className="text-sm font-medium text-gray-500">业务整体情况</h3>}
+          pagination={false}
+          showDownload
+          downloadFilename="业务整体情况明细"
             headers={['指标', '数值', '人次占比（%）', '同比数值', '同比增长']}
             rows={[
               ['总人次', formatNum(12458 * multiplier), '-', formatNum(11800 * multiplier), <span className="text-rose-600 font-medium">+5.5%</span>],
@@ -224,19 +225,18 @@ export function DeptBusiness() {
               ['省内异地-居民', formatNum(1858 * multiplier), '14.9%', formatNum(1700 * multiplier), <span className="text-rose-600 font-medium">+9.2%</span>]
             ]}
           />
-        </div>
       </Card>
 
       <Card>
-        <CardTitle>明细数据情况</CardTitle>
-        <div className="mt-6">
-          <Table 
-            pagination={true}
-            pageSize={10}
-            headers={['出院科室', '收治排名', '总人次', '同比增长', '业务人次占比（%）', '总费用（万元）', '同比增长', '次均费用（万元）', '同比增长', '记账费用（万元）', '总分值', '次均分值', '同比增长']}
-            rows={filteredRows}
-          />
-        </div>
+        <Table 
+          title={<h3 className="text-sm font-medium text-gray-500">明细数据情况</h3>}
+          pagination={true}
+          pageSize={10}
+          showDownload
+          downloadFilename="科室明细数据情况"
+          headers={['出院科室', '收治排名', '总人次', '同比增长', '业务人次占比（%）', '总费用（万元）', '同比增长', '次均费用（万元）', '同比增长', '记账费用（万元）', '总分值', '次均分值', '同比增长']}
+          rows={filteredRows}
+        />
       </Card>
     </div>
   );

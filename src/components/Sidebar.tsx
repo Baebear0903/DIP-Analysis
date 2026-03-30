@@ -11,8 +11,8 @@ interface SidebarProps {
 export function Sidebar({ activeMenu, setActiveMenu, isCollapsed, setIsCollapsed }: SidebarProps) {
   const menuItems = [
     { id: 'overview-group', label: '住院医保数据分析', icon: LayoutDashboard, sub: [
-      { id: 'overview', label: '医保数据概览' },
-      { id: 'dept-business', label: '科室业务情况' }
+      { id: 'overview', label: '1 医保数据概览' },
+      { id: 'dept-business', label: '1.1 科室业务情况' }
     ]}
   ];
 

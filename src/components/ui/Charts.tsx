@@ -14,8 +14,10 @@ import {
   ScatterChart as RechartsScatterChart,
   Scatter,
   ZAxis,
-  ReferenceLine
+  ReferenceLine,
+  LabelList
 } from 'recharts';
+import { Download } from 'lucide-react';
 
 export function DonutChart({ data, colors = ['#3b82f6', '#06b6d4', '#6366f1', '#8b5cf6', '#d946ef', '#10b981', '#f59e0b'] }: { data: any[], colors?: string[] }) {
   const total = data.reduce((sum, item) => sum + item.value, 0);
@@ -192,8 +194,12 @@ export function GroupedBarChart({ data }: { data: any[] }) {
             iconType="circle" 
             wrapperStyle={{ paddingBottom: '20px' }} 
           />
-          <Bar dataKey="current" name="今年" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={32} />
-          <Bar dataKey="last" name="去年" fill="#94a3b8" radius={[4, 4, 0, 0]} barSize={32} />
+          <Bar dataKey="current" name="今年" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={32}>
+            <LabelList dataKey="current" position="top" fill="#6b7280" fontSize={10} />
+          </Bar>
+          <Bar dataKey="last" name="去年" fill="#94a3b8" radius={[4, 4, 0, 0]} barSize={32}>
+            <LabelList dataKey="last" position="top" fill="#6b7280" fontSize={10} />
+          </Bar>
         </RechartsBarChart>
       </ResponsiveContainer>
     </div>
@@ -220,7 +226,9 @@ export function BarChart({ data }: { data: any[] }) {
             cursor={{ fill: '#f9fafb' }}
             contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
           />
-          <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]}>
+            <LabelList dataKey="value" position="top" fill="#6b7280" fontSize={10} />
+          </Bar>
         </RechartsBarChart>
       </ResponsiveContainer>
     </div>
@@ -305,14 +313,61 @@ export function ScatterChart({ data, xLabel, yLabel, xUnit = '', yUnit = '', xRe
   );
 }
 
-export function Table({ headers, rows, pageSize = 5, pagination = true }: { headers: string[], rows: React.ReactNode[][], pageSize?: number, pagination?: boolean }) {
+export function Table({ title, headers, rows, pageSize = 5, pagination = true, showDownload = false, downloadFilename = "data" }: { title?: React.ReactNode, headers: string[], rows: React.ReactNode[][], pageSize?: number, pagination?: boolean, showDownload?: boolean, downloadFilename?: string }) {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(rows.length / pageSize);
   
   const currentRows = pagination ? rows.slice((currentPage - 1) * pageSize, currentPage * pageSize) : rows;
 
+  const handleDownload = () => {
+    // Extract text content from React nodes if necessary
+    const extractText = (node: any): string => {
+      if (typeof node === 'string' || typeof node === 'number') return String(node);
+      if (React.isValidElement(node)) {
+        if (node.props && node.props.children) {
+          if (Array.isArray(node.props.children)) {
+            return node.props.children.map(extractText).join('');
+          }
+          return extractText(node.props.children);
+        }
+      }
+      return '';
+    };
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${extractText(cell).replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${downloadFilename}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="w-full">
+      {(title || showDownload) && (
+        <div className="flex items-center justify-between mb-4">
+          {title ? (
+            typeof title === 'string' ? <h3 className="text-sm font-medium text-gray-700">{title}</h3> : title
+          ) : <div />}
+          {showDownload && (
+            <button 
+              onClick={handleDownload}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              下载数据
+            </button>
+          )}
+        </div>
+      )}
       <div className="w-full overflow-x-auto rounded-lg ring-1 ring-gray-200">
         <table className="w-full text-sm text-left text-gray-500">
           <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-200">

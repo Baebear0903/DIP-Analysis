@@ -8,8 +8,11 @@ export function Card({ children, className = '' }: { children: React.ReactNode; 
   );
 }
 
-export function CardTitle({ children }: { children: React.ReactNode }) {
+export function CardTitle({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <h3 className="text-sm font-medium text-gray-500 mb-6">{children}</h3>
+    <div className="flex items-center justify-between mb-6">
+      <h3 className="text-sm font-medium text-gray-500">{children}</h3>
+      {action && <div>{action}</div>}
+    </div>
   );
 }

@@ -353,7 +353,14 @@ export function Overview() {
   const formatNum = (num: number, decimals = 0) => num.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 
   const filteredKpiData = kpiData.map(kpi => {
-    if (kpi.title === '整体 CMI' || kpi.title === '住院自费率' || kpi.title === '人次人头比' || kpi.title === '全院测算情况' || kpi.title === '全院灰码率') {
+    if (kpi.title === '整体 CMI' || kpi.title === '人次人头比') {
+      const num = parseFloat(kpi.value.replace(/,/g, ''));
+      return {
+        ...kpi,
+        value: isNaN(num) ? kpi.value : formatNum(num, 4)
+      };
+    }
+    if (kpi.title === '住院自费率' || kpi.title === '全院测算情况' || kpi.title === '全院灰码率') {
       return kpi;
     }
     const num = parseFloat(kpi.value.replace(/,/g, ''));
@@ -527,7 +534,7 @@ export function Overview() {
             <BarChart data={dept1BarData.filter(d => isAll || validLabels.includes(d.name)).map(d => ({ ...d, value: d.value * multiplier }))} />
           </div>
           <div>
-            <Table headers={['科室', '总费用(元)', 'CMI', '测算结余情况(元)']} rows={filteredTable1Data} pageSize={5} />
+            <Table title={<h4 className="text-sm font-medium text-gray-700">医保人次前20科室明细</h4>} headers={['科室', '总费用(元)', 'CMI', '测算结余情况(元)']} rows={filteredTable1Data} pageSize={5} showDownload downloadFilename="医保人次前20科室明细" />
           </div>
         </div>
       </Card>
@@ -540,7 +547,7 @@ export function Overview() {
             <BarChart data={dept1BarData.filter(d => isAll || validLabels.includes(d.name)).map(d => ({ ...d, value: d.value * multiplier }))} />
           </div>
           <div>
-            <Table headers={['科室', '中医病种人次', '中医病种总费用', '中医病种总分值', '中医病种CMI']} rows={filteredTable2Data} pageSize={5} />
+            <Table title={<h4 className="text-sm font-medium text-gray-700">入组中医病种前20科室明细</h4>} headers={['科室', '中医病种人次', '中医病种总费用', '中医病种总分值', '中医病种CMI']} rows={filteredTable2Data} pageSize={5} showDownload downloadFilename="入组中医病种前20科室明细" />
           </div>
         </div>
       </Card>
@@ -553,7 +560,7 @@ export function Overview() {
             <BarChart data={filteredDiseaseBarData} />
           </div>
           <div>
-            <Table headers={['病种编码及名称', '人次', '总费用', '总分值', '测算结余情况']} rows={filteredTable3Data} pageSize={5} />
+            <Table title={<h4 className="text-sm font-medium text-gray-700">入组前20综合病种明细</h4>} headers={['病种编码及名称', '人次', '总费用', '总分值', '测算结余情况']} rows={filteredTable3Data} pageSize={5} showDownload downloadFilename="入组前20综合病种明细" />
           </div>
         </div>
       </Card>
@@ -566,7 +573,7 @@ export function Overview() {
             <BarChart data={filteredTcmDiseaseBarData} />
           </div>
           <div>
-            <Table headers={['病种编码及名称', '人次', '总费用', '总分值', '测算结余情况']} rows={filteredTable4Data} pageSize={5} />
+            <Table title={<h4 className="text-sm font-medium text-gray-700">入组前20中医病种明细</h4>} headers={['病种编码及名称', '人次', '总费用', '总分值', '测算结余情况']} rows={filteredTable4Data} pageSize={5} showDownload downloadFilename="入组前20中医病种明细" />
           </div>
         </div>
       </Card>
