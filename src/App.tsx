@@ -8,6 +8,9 @@ import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { Overview } from './components/Overview';
 import { DeptBusiness } from './components/DeptBusiness';
+import { DiseaseDistribution } from './components/DiseaseDistribution';
+import { CmiAnalysis } from './components/CmiAnalysis';
+import { DeviationAnalysis } from './components/DeviationAnalysis';
 import { DetailManagement } from './components/DetailManagement';
 import { Card, CardTitle } from './components/ui/Card';
 import { Database } from 'lucide-react';
@@ -27,6 +30,9 @@ export default function App() {
           <div className="max-w-7xl mx-auto space-y-10">
             {activeMenu === 'overview' && <Overview />}
             {activeMenu === 'dept-business' && <DeptBusiness />}
+            {activeMenu === 'disease-distribution' && <DiseaseDistribution />}
+            {activeMenu === 'cmi-analysis' && <CmiAnalysis />}
+            {activeMenu === 'deviation-analysis' && <DeviationAnalysis />}
             {activeMenu === 'detail-management' && <DetailManagement />}
           </div>
         </main>

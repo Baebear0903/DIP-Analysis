@@ -3,116 +3,8 @@ import { Card, CardTitle } from './ui/Card';
 import { Badge } from './ui/Badge';
 import { DonutChart, BarChart, HorizontalBarChart, ScatterChart, Table, GroupedBarChart } from './ui/Charts';
 import { ChevronDown, ChevronRight, Search } from 'lucide-react';
-
-const treeData = [
-  {
-    label: '全院 (3院区)',
-    value: 'all',
-    children: [
-      {
-        label: '天河院区',
-        value: 'tianhe',
-        children: [
-          { label: '心血管内科', value: 'xxgnk' },
-          { label: '呼吸内科', value: 'hxnk' },
-          { label: '消化内科', value: 'xhnk' },
-        ]
-      },
-      {
-        label: '珠玑院区',
-        value: 'zhuji',
-        children: [
-          { label: '骨科', value: 'gk' },
-          { label: '普外科', value: 'pwk' },
-          { label: '泌尿外科', value: 'mnwk' },
-        ]
-      },
-      {
-        label: '同德院区',
-        value: 'tongde',
-        children: [
-          { label: '妇产科', value: 'fck' },
-          { label: '儿科', value: 'ek' },
-          { label: '急诊科', value: 'jzk' },
-        ]
-      }
-    ]
-  }
-];
-
-function TreeSelect({ data, value, onChange }: { data: any[], value: string, onChange: (v: string) => void }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [expanded, setExpanded] = useState<string[]>(['all']);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const toggleExpand = (e: React.MouseEvent, val: string) => {
-    e.stopPropagation();
-    setExpanded(prev => 
-      prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]
-    );
-  };
-
-  const findLabel = (items: any[], val: string): string => {
-    for (const item of items) {
-      if (item.value === val) return item.label;
-      if (item.children) {
-        const found = findLabel(item.children, val);
-        if (found) return found;
-      }
-    }
-    return '';
-  };
-
-  const renderItems = (items: any[], level = 0) => {
-    return items.map(item => (
-      <div key={item.value}>
-        <div 
-          className={`flex items-center py-1.5 px-3 hover:bg-blue-50 cursor-pointer text-sm ${value === item.value ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'}`}
-          style={{ paddingLeft: `${level * 16 + 12}px` }}
-          onClick={() => {
-            onChange(item.value);
-            if (!item.children) setIsOpen(false);
-          }}
-        >
-          {item.children ? (
-            <button onClick={(e) => toggleExpand(e, item.value)} className="mr-1 p-0.5 hover:bg-gray-200 rounded">
-              {expanded.includes(item.value) ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-            </button>
-          ) : <div className="w-4" />}
-          <span>{item.label}</span>
-        </div>
-        {item.children && expanded.includes(item.value) && renderItems(item.children, level + 1)}
-      </div>
-    ));
-  };
-
-  return (
-    <div className="relative w-72" ref={containerRef}>
-      <div 
-        className="flex items-center justify-between border border-gray-200 rounded-md shadow-sm py-1.5 px-3 bg-white cursor-pointer hover:border-blue-400 transition-colors"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <span className="text-sm text-gray-700 truncate">{findLabel(data, value) || '请选择科室'}</span>
-        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </div>
-      {isOpen && (
-        <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-80 overflow-y-auto py-1">
-          {renderItems(data)}
-        </div>
-      )}
-    </div>
-  );
-}
+import { FilterBar } from './ui/FilterBar';
+import { treeData, getValidLabels } from '../constants';
 
 const kpiData = [
   {
@@ -322,26 +214,6 @@ const table4Data = tcmDiseaseScatterData.map((d, i) => {
   ];
 });
 
-const getValidLabels = (data: any[], val: string): string[] => {
-  let labels: string[] = [];
-  const findNodeAndChildren = (items: any[], targetVal: string, isChild = false) => {
-    for (const item of items) {
-      if (item.value === targetVal || isChild) {
-        labels.push(item.label);
-        if (item.children) {
-          findNodeAndChildren(item.children, targetVal, true);
-        }
-        if (!isChild) return true;
-      } else if (item.children) {
-        if (findNodeAndChildren(item.children, targetVal, false)) return true;
-      }
-    }
-    return false;
-  };
-  findNodeAndChildren(data, val);
-  return labels;
-};
-
 export function Overview() {
   const [selectedDept, setSelectedDept] = useState('all');
   const [scatterDimension, setScatterDimension] = useState<'department' | 'comprehensive' | 'tcm'>('department');
@@ -446,38 +318,7 @@ export function Overview() {
 
   return (
     <div className="space-y-10">
-      <Card>
-        <div className="flex flex-wrap items-center gap-8">
-          <div className="flex items-center gap-3">
-            <label className="text-sm font-semibold text-gray-600">时间范围</label>
-            <div className="flex items-center gap-2">
-              <select className="text-sm border-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 py-1.5 pl-3 pr-8 bg-white">
-                <option>2023年</option>
-                <option>2024年</option>
-              </select>
-              <select className="text-sm border-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 py-1.5 pl-3 pr-8 bg-white">
-                <option>第一季度</option>
-                <option>第二季度</option>
-                <option>第三季度</option>
-                <option>第四季度</option>
-              </select>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <label className="text-sm font-semibold text-gray-600">科室</label>
-            <div className="flex items-center gap-4">
-              <TreeSelect data={treeData} value={selectedDept} onChange={setSelectedDept} />
-              <span className="text-[10px] text-gray-400 whitespace-nowrap">选中科室后，可以查看对应科室数据</span>
-            </div>
-          </div>
-
-          <button className="ml-auto flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-semibold transition-all shadow-md active:scale-95">
-            <Search className="w-4 h-4" />
-            查询分析
-          </button>
-        </div>
-      </Card>
+      <FilterBar selectedDept={selectedDept} setSelectedDept={setSelectedDept} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredKpiData.map((kpi: any, i) => (
@@ -584,19 +425,19 @@ export function Overview() {
           <div className="flex bg-gray-100 p-1 rounded-lg">
             <button
               onClick={() => setScatterDimension('department')}
-              className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${scatterDimension === 'department' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+              className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${scatterDimension === 'department' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}
             >
               Top20科室
             </button>
             <button
               onClick={() => setScatterDimension('comprehensive')}
-              className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${scatterDimension === 'comprehensive' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+              className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${scatterDimension === 'comprehensive' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}
             >
               Top20综合病种
             </button>
             <button
               onClick={() => setScatterDimension('tcm')}
-              className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${scatterDimension === 'tcm' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+              className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${scatterDimension === 'tcm' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}
             >
               Top20中医病种
             </button>
