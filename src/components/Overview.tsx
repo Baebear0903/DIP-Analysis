@@ -19,7 +19,7 @@ const kpiData = [
     title: "医疗总费用 (元)",
     value: "145,670,230",
     subs: [
-      { label: "次均总费用", value: "11,692", trend: { value: "同比 -1.20%", isPositive: true }, colSpan: 2 }
+      { label: "次均总费用", value: "11,692", trend: { value: "同比 -140", isPositive: true }, colSpan: 2 }
     ]
   },
   {
@@ -33,16 +33,16 @@ const kpiData = [
     title: "医保分值",
     value: "1,204,500",
     subs: [
-      { label: "次均分值", value: "96.6", trend: { value: "同比 +2.40%", isPositive: false }, colSpan: 2 }
+      { label: "次均分值", value: "96.6", trend: { value: "同比 +2.3", isPositive: false }, colSpan: 2 }
     ]
   },
   {
     title: "整体 CMI",
-    value: "1.15",
-    trend: { value: "同比 +4.55%", isPositive: false },
+    value: "1.1500",
+    trend: { value: "同比 +0.0500", isPositive: false },
     subs: [
-      { label: "广州医保CMI", value: "1.12" },
-      { label: "省内异地CMI", value: "1.21" }
+      { label: "广州医保CMI", value: "1.1200" },
+      { label: "省内异地CMI", value: "1.2100" }
     ]
   },
   {
@@ -56,8 +56,10 @@ const kpiData = [
   {
     title: "人次人头比",
     value: "1.2",
-    trend: { value: "同比 +5.20%", isPositive: false },
-    subs: []
+    trend: { value: "同比 +0.0600", isPositive: false },
+    subs: [
+      { label: "去年同期", value: "1.1400" }
+    ]
   },
   {
     title: "全院测算情况",
@@ -150,14 +152,14 @@ const dept1ScatterData = [
 ];
 
 const diseaseBarData = Array.from({ length: 20 }).map((_, i) => ({
-  name: `综合病种${i + 1}`,
+  name: `病种${i + 1}`,
   value: Math.floor(Math.random() * 500 + 50)
 })).sort((a, b) => b.value - a.value);
 
 const diseaseScatterData = Array.from({ length: 20 }).map((_, i) => ({
-  name: `综合病种${i + 1}`,
+  name: `病种${i + 1}`,
   x: Math.floor(Math.random() * 400000 - 100000),
-  y: Number((Math.random() * 1.5 + 0.5).toFixed(2))
+  y: Number((Math.random() * 1.5 + 0.5).toFixed(4))
 }));
 
 const tcmDiseaseBarData = Array.from({ length: 20 }).map((_, i) => ({
@@ -168,13 +170,13 @@ const tcmDiseaseBarData = Array.from({ length: 20 }).map((_, i) => ({
 const tcmDiseaseScatterData = Array.from({ length: 20 }).map((_, i) => ({
   name: `中医病种${i + 1}`,
   x: Math.floor(Math.random() * 200000 - 50000),
-  y: Number((Math.random() * 1.5 + 0.5).toFixed(2))
+  y: Number((Math.random() * 1.5 + 0.5).toFixed(4))
 }));
 
 const table1Data = dept1ScatterData.map(d => [
   d.name,
   (Math.random() * 10000000 + 5000000).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-  d.y.toFixed(2),
+  d.y.toFixed(4),
   <span className={d.x >= 0 ? "text-emerald-600 font-medium" : "text-rose-600 font-medium"}>
     {d.x > 0 ? '+' : ''}{d.x.toLocaleString()}
   </span>
@@ -185,7 +187,7 @@ const table2Data = dept1ScatterData.map(d => [
   (Math.random() * 1000 + 200).toFixed(0),
   (Math.random() * 5000000 + 1000000).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
   (Math.random() * 50000 + 10000).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-  (d.y * 0.8).toFixed(2)
+  (d.y * 0.8).toFixed(4)
 ]);
 
 const table3Data = diseaseScatterData.map((d, i) => {
@@ -291,6 +293,7 @@ export function Overview() {
     if (scatterDimension === 'comprehensive') {
       return diseaseScatterData.map((d, i) => ({
         name: `BZ${String(i + 1).padStart(3, '0')} - ${d.name}`,
+        label: `BZ${String(i + 1).padStart(3, '0')}`,
         x: d.x * multiplier, // 结余
         y: d.y  // CMI
       }));
@@ -298,6 +301,7 @@ export function Overview() {
     if (scatterDimension === 'tcm') {
       return tcmDiseaseScatterData.map((d, i) => ({
         name: `ZY${String(i + 1).padStart(3, '0')} - ${d.name}`,
+        label: `ZY${String(i + 1).padStart(3, '0')}`,
         x: d.x * multiplier, // 结余
         y: d.y  // CMI
       }));
@@ -305,6 +309,7 @@ export function Overview() {
 
     return sourceData.map(d => ({
       name: d.name,
+      label: d.name,
       x: d.x, // 结余
       y: d.y  // CMI
     }));
@@ -394,14 +399,14 @@ export function Overview() {
       </Card>
 
       <Card>
-        <CardTitle>入组综合病种分析</CardTitle>
+        <CardTitle>入组病种分析</CardTitle>
         <div className="flex flex-col gap-10 mt-6">
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-4 text-center">入组前20综合病种</h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-4 text-center">入组前20病种</h4>
             <BarChart data={filteredDiseaseBarData} />
           </div>
           <div>
-            <Table title={<h4 className="text-sm font-medium text-gray-700">入组前20综合病种明细</h4>} headers={['病种编码及名称', '人次', '总费用', '总分值', '测算结余情况']} rows={filteredTable3Data} pageSize={5} showDownload downloadFilename="入组前20综合病种明细" />
+            <Table title={<h4 className="text-sm font-medium text-gray-700">入组前20病种明细</h4>} headers={['病种编码及名称', '人次', '总费用', '总分值', '测算结余情况']} rows={filteredTable3Data} pageSize={5} showDownload downloadFilename="入组前20病种明细" />
           </div>
         </div>
       </Card>
@@ -433,7 +438,7 @@ export function Overview() {
               onClick={() => setScatterDimension('comprehensive')}
               className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${scatterDimension === 'comprehensive' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}
             >
-              Top20综合病种
+              Top20病种
             </button>
             <button
               onClick={() => setScatterDimension('tcm')}

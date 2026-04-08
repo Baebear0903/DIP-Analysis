@@ -183,10 +183,12 @@ export function GroupedBarChart({ data }: { data: any[] }) {
             tickLine={false} 
             tick={{ fill: '#6b7280', fontSize: 12 }}
             domain={[0, 'auto']}
+            tickFormatter={(value) => value.toFixed(4)}
           />
           <Tooltip 
              cursor={{ fill: '#f9fafb' }}
              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+             formatter={(value: number) => value.toFixed(4)}
           />
           <Legend 
             verticalAlign="top" 
@@ -195,10 +197,10 @@ export function GroupedBarChart({ data }: { data: any[] }) {
             wrapperStyle={{ paddingBottom: '20px' }} 
           />
           <Bar dataKey="current" name="今年" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={32}>
-            <LabelList dataKey="current" position="top" fill="#6b7280" fontSize={10} />
+            <LabelList dataKey="current" position="top" fill="#6b7280" fontSize={10} formatter={(val: number) => val.toFixed(4)} />
           </Bar>
           <Bar dataKey="last" name="去年" fill="#94a3b8" radius={[4, 4, 0, 0]} barSize={32}>
-            <LabelList dataKey="last" position="top" fill="#6b7280" fontSize={10} />
+            <LabelList dataKey="last" position="top" fill="#6b7280" fontSize={10} formatter={(val: number) => val.toFixed(4)} />
           </Bar>
         </RechartsBarChart>
       </ResponsiveContainer>
@@ -278,8 +280,9 @@ export function ScatterChart({ data, xLabel, yLabel, xUnit = '', yUnit = '', xRe
             axisLine={false} 
             tickLine={false} 
             tick={{ fill: '#6b7280', fontSize: 10 }}
+            tickFormatter={(value) => value.toFixed(4)}
           />
-          <ZAxis type="number" range={[100, 1000]} />
+          <ZAxis type="number" range={[400, 400]} />
           <Tooltip 
             cursor={{ strokeDasharray: '3 3' }}
             content={({ active, payload }) => {
@@ -295,7 +298,7 @@ export function ScatterChart({ data, xLabel, yLabel, xUnit = '', yUnit = '', xRe
                       </div>
                       <div className="flex items-center justify-between gap-8">
                         <span className="text-xs text-gray-500">{yLabel}</span>
-                        <span className="text-xs font-bold text-gray-900">{data.y}{yUnit}</span>
+                        <span className="text-xs font-bold text-gray-900">{typeof data.y === 'number' ? data.y.toFixed(4) : data.y}{yUnit}</span>
                       </div>
                     </div>
                   </div>
@@ -306,7 +309,9 @@ export function ScatterChart({ data, xLabel, yLabel, xUnit = '', yUnit = '', xRe
           />
           {xReference !== undefined && <ReferenceLine x={xReference} stroke="#ef4444" strokeDasharray="3 3" strokeWidth={1} />}
           {yReference !== undefined && <ReferenceLine y={yReference} stroke="#ef4444" strokeDasharray="3 3" strokeWidth={1} />}
-          <Scatter name="数据点" data={data} fill="#3b82f6" fillOpacity={0.6} stroke="#2563eb" />
+          <Scatter name="数据点" data={data} fill="#3b82f6" fillOpacity={0.6} stroke="#2563eb">
+            <LabelList dataKey="label" position="top" fill="#6b7280" fontSize={10} offset={10} />
+          </Scatter>
         </RechartsScatterChart>
       </ResponsiveContainer>
     </div>
