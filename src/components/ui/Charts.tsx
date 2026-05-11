@@ -238,19 +238,25 @@ export function BarChart({ data }: { data: any[] }) {
 }
 
 export function HorizontalBarChart({ data }: { data: any[] }) {
-  const max = Math.max(...data.map(d => d.value));
+  const max = Math.max(...data.map(d => d.value), 1);
   return (
-    <div className="flex flex-col gap-4 py-2">
-      {data.map((d, i) => (
-        <div key={i} className="flex items-center gap-4 group">
-          <span className="text-sm text-gray-500 w-32 text-right truncate" title={d.name}>{d.name}</span>
-          <div className="flex-1 h-6 bg-gray-100 rounded-sm overflow-hidden flex items-center">
+    <div className="flex flex-col h-full justify-between py-1">
+      {data.slice(0, 20).map((d, i) => (
+        <div key={i} className="flex flex-col gap-1 group">
+          <div className="flex items-center justify-between px-0.5">
+            <span className="text-[11px] font-medium text-gray-600 truncate max-w-[75%]" title={d.name}>
+              {d.name}
+            </span>
+            <span className="text-[11px] font-bold text-gray-900 tabular-nums">
+              {d.value.toLocaleString()}
+            </span>
+          </div>
+          <div className="relative h-1.5 w-full bg-gray-100/80 rounded-full overflow-hidden">
             <div 
-              className={`h-full rounded-sm transition-all duration-300 ${d.highlight ? 'bg-rose-500' : 'bg-blue-500'}`}
+              className={`absolute left-0 top-0 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_-2px_rgba(59,130,246,0.5)] ${d.highlight ? 'bg-rose-500' : 'bg-blue-500'}`}
               style={{ width: `${(d.value / max) * 100}%` }}
             />
           </div>
-          <span className="text-sm font-medium text-gray-900 w-12">{d.value}</span>
         </div>
       ))}
     </div>
@@ -396,46 +402,34 @@ export function Table({ title, headers, rows, pageSize = 5, pagination = true, s
         </table>
       </div>
       {pagination && totalPages > 1 && (
-        <div className="flex items-center justify-between py-3">
-          <div className="flex flex-1 items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-700">
-                显示第 <span className="font-medium">{(currentPage - 1) * pageSize + 1}</span> 到 <span className="font-medium">{Math.min(currentPage * pageSize, rows.length)}</span> 条，共 <span className="font-medium">{rows.length}</span> 条
-              </p>
+        <div className="flex items-center justify-between pt-5 border-t border-gray-100 mt-2">
+          <p className="text-xs text-gray-500">
+            共 <span className="font-semibold text-gray-900">{rows.length}</span> 条记录
+          </p>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              className="p-1.5 rounded-md hover:bg-gray-100 text-gray-400 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
+              </svg>
+            </button>
+            <div className="flex items-center gap-1 px-2">
+              <span className="text-xs font-semibold text-blue-600">{currentPage}</span>
+              <span className="text-xs text-gray-400">/</span>
+              <span className="text-xs text-gray-500">{totalPages}</span>
             </div>
-            <div>
-              <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                <button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
-                >
-                  <span className="sr-only">上一页</span>
-                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
-                  </svg>
-                </button>
-                {Array.from({ length: totalPages }).map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentPage(i + 1)}
-                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${currentPage === i + 1 ? 'z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600' : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'}`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
-                >
-                  <span className="sr-only">下一页</span>
-                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-                  </svg>
-                </button>
-              </nav>
-            </div>
+            <button
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+              className="p-1.5 rounded-md hover:bg-gray-100 text-gray-400 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+              </svg>
+            </button>
           </div>
         </div>
       )}

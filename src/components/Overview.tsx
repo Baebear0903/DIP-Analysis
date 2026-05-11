@@ -105,51 +105,22 @@ const cmiComparisonData = [
   { category: '省内异地', current: 1.21, last: 1.18 }
 ];
 
-const dept1BarData = [
-  { name: '心血管内科', value: 1240 },
-  { name: '呼吸内科', value: 980 },
-  { name: '消化内科', value: 850 },
-  { name: '骨科', value: 820 },
-  { name: '神经内科', value: 780 },
-  { name: '普外科', value: 750 },
-  { name: '妇产科', value: 710 },
-  { name: '儿科', value: 680 },
-  { name: '泌尿外科', value: 650 },
-  { name: '内分泌科', value: 620 },
-  { name: '肾内科', value: 590 },
-  { name: '眼科', value: 560 },
-  { name: '耳鼻喉科', value: 530 },
-  { name: '神经外科', value: 490 },
-  { name: '胸外科', value: 460 },
-  { name: '血液内科', value: 420 },
-  { name: '口腔科', value: 390 },
-  { name: '皮肤科', value: 350 },
-  { name: '免疫科', value: 310 },
-  { name: '心脏外科', value: 280 }
+const allDepartments = [
+  '心血管内科', '呼吸内科', '消化内科', '神经内科', '血液内科', '肾内科', '内分泌科', '风湿免疫科', '感染内科',
+  '骨科', '普外科', '泌尿外科', '神经外科', '胸外科', '心脏外科', '烧伤科', '整形外科', '运动医学科',
+  '妇产科', '儿科', '急诊科', '重症医学科', '眼科', '耳鼻喉科', '口腔科', '皮肤科', '肿瘤科', '康复医学科'
 ];
 
-const dept1ScatterData = [
-  { name: '心血管内科', x: 340000, y: 1.35 },
-  { name: '呼吸内科', x: 120000, y: 1.12 },
-  { name: '消化内科', x: 80000, y: 1.08 },
-  { name: '骨科', x: -50000, y: 1.45 },
-  { name: '神经内科', x: 150000, y: 1.25 },
-  { name: '普外科', x: -80000, y: 1.38 },
-  { name: '妇产科', x: 200000, y: 0.95 },
-  { name: '儿科', x: 60000, y: 0.85 },
-  { name: '泌尿外科', x: 90000, y: 1.15 },
-  { name: '内分泌科', x: 40000, y: 0.98 },
-  { name: '肾内科', x: -30000, y: 1.22 },
-  { name: '眼科', x: 110000, y: 0.88 },
-  { name: '耳鼻喉科', x: 70000, y: 0.92 },
-  { name: '神经外科', x: -150000, y: 1.65 },
-  { name: '胸外科', x: -110000, y: 1.55 },
-  { name: '血液内科', x: 20000, y: 1.42 },
-  { name: '口腔科', x: 130000, y: 0.75 },
-  { name: '皮肤科', x: 180000, y: 0.65 },
-  { name: '免疫科', x: 10000, y: 1.18 },
-  { name: '心脏外科', x: -200000, y: 1.85 }
-];
+const dept1BarData = allDepartments.map((name, i) => ({
+  name,
+  value: Math.floor(1500 - i * 40 + Math.random() * 50)
+})).sort((a, b) => b.value - a.value);
+
+const dept1ScatterData = allDepartments.map((name, i) => ({
+  name,
+  x: Math.floor(Math.random() * 600000 - 150000),
+  y: Number((Math.random() * 1.5 + 0.5).toFixed(4))
+}));
 
 const diseaseBarData = Array.from({ length: 20 }).map((_, i) => ({
   name: `病种${i + 1}`,
@@ -374,52 +345,68 @@ export function Overview() {
 
       <Card>
         <CardTitle>医保人次分析</CardTitle>
-        <div className="flex flex-col gap-10 mt-6">
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-4 text-center">医保人次前20科室</h4>
-            <BarChart data={dept1BarData.filter(d => isAll || validLabels.includes(d.name)).map(d => ({ ...d, value: d.value * multiplier }))} />
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mt-6">
+          <div className="lg:col-span-2 flex flex-col">
+            <h4 className="text-sm font-medium text-gray-700 mb-4 shrink-0">医保人次Top20科室</h4>
+            <div className="flex-1 min-h-0">
+              <HorizontalBarChart data={dept1BarData.filter(d => isAll || validLabels.includes(d.name)).slice(0, 20).map(d => ({ ...d, value: d.value * multiplier }))} />
+            </div>
           </div>
-          <div>
-            <Table title={<h4 className="text-sm font-medium text-gray-700">医保人次前20科室明细</h4>} headers={['科室', '总费用(元)', 'CMI', '测算结余情况(元)']} rows={filteredTable1Data} pageSize={5} showDownload downloadFilename="医保人次前20科室明细" />
+          <div className="lg:col-span-3 flex flex-col justify-center">
+            <Table title={<h4 className="text-sm font-medium text-gray-700">Top20科室明细</h4>} headers={['科室', '总费用(元)', 'CMI', '测算结余情况(元)']} rows={filteredTable1Data.slice(0, 20)} pageSize={10} showDownload downloadFilename="医保人次Top20科室明细" />
           </div>
         </div>
       </Card>
 
       <Card>
         <CardTitle>中医优势病种分析</CardTitle>
-        <div className="flex flex-col gap-10 mt-6">
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-4 text-center">入组中医病种前20科室</h4>
-            <BarChart data={dept1BarData.filter(d => isAll || validLabels.includes(d.name)).map(d => ({ ...d, value: d.value * multiplier }))} />
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mt-6">
+          <div className="lg:col-span-2 flex flex-col">
+            <h4 className="text-sm font-medium text-gray-700 mb-4 shrink-0">中医病种Top20科室</h4>
+            <div className="flex-1 min-h-0">
+              <HorizontalBarChart data={dept1BarData.filter(d => isAll || validLabels.includes(d.name)).slice(0, 20).map(d => ({ ...d, value: d.value * multiplier }))} />
+            </div>
           </div>
-          <div>
-            <Table title={<h4 className="text-sm font-medium text-gray-700">入组中医病种前20科室明细</h4>} headers={['科室', '中医病种人次', '中医病种总费用', '中医病种总分值', '中医病种CMI']} rows={filteredTable2Data} pageSize={5} showDownload downloadFilename="入组中医病种前20科室明细" />
+          <div className="lg:col-span-3 flex flex-col justify-center">
+            <Table title={<h4 className="text-sm font-medium text-gray-700">中医病种Top20科室明细</h4>} headers={['科室', '中医病种人次', '中医病种总费用', '中医病种总分值', '中医病种CMI']} rows={filteredTable2Data.slice(0, 20)} pageSize={10} showDownload downloadFilename="入组中医病种Top20科室明细" />
           </div>
         </div>
       </Card>
 
       <Card>
         <CardTitle>入组病种分析</CardTitle>
-        <div className="flex flex-col gap-10 mt-6">
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-4 text-center">入组前20病种</h4>
-            <BarChart data={filteredDiseaseBarData} />
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mt-6">
+          <div className="lg:col-span-2 flex flex-col">
+            <h4 className="text-sm font-medium text-gray-700 mb-4 shrink-0">入组前20病种</h4>
+            <div className="flex-1 min-h-0">
+              <HorizontalBarChart data={filteredDiseaseBarData.map(d => {
+                const numMatches = d.name.match(/\d+/);
+                const num = numMatches ? parseInt(numMatches[0], 10) : 1;
+                return { ...d, name: `BZ${String(num).padStart(3, '0')} - ${d.name}` };
+              })} />
+            </div>
           </div>
-          <div>
-            <Table title={<h4 className="text-sm font-medium text-gray-700">入组前20病种明细</h4>} headers={['病种编码及名称', '人次', '总费用', '总分值', '测算结余情况']} rows={filteredTable3Data} pageSize={5} showDownload downloadFilename="入组前20病种明细" />
+          <div className="lg:col-span-3 flex flex-col justify-center">
+            <Table title={<h4 className="text-sm font-medium text-gray-700">入组病种Top20明细</h4>} headers={['病种编码及名称', '人次', '总费用', '总分值', '测算结余情况']} rows={filteredTable3Data} pageSize={10} showDownload downloadFilename="入组前20病种明细" />
           </div>
         </div>
       </Card>
 
       <Card>
         <CardTitle>入组中医病种分析</CardTitle>
-        <div className="flex flex-col gap-10 mt-6">
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-4 text-center">入组前20中医病种</h4>
-            <BarChart data={filteredTcmDiseaseBarData} />
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mt-6">
+          <div className="lg:col-span-2 flex flex-col">
+            <h4 className="text-sm font-medium text-gray-700 mb-4 shrink-0">入组前20中医病种</h4>
+            <div className="flex-1 min-h-0">
+              <HorizontalBarChart data={filteredTcmDiseaseBarData.map(d => {
+                const numMatches = d.name.match(/\d+/);
+                const num = numMatches ? parseInt(numMatches[0], 10) : 1;
+                return { ...d, name: `ZY${String(num).padStart(3, '0')} - ${d.name}` };
+              })} />
+            </div>
           </div>
-          <div>
-            <Table title={<h4 className="text-sm font-medium text-gray-700">入组前20中医病种明细</h4>} headers={['病种编码及名称', '人次', '总费用', '总分值', '测算结余情况']} rows={filteredTable4Data} pageSize={5} showDownload downloadFilename="入组前20中医病种明细" />
+          <div className="lg:col-span-3 flex flex-col justify-center">
+            <Table title={<h4 className="text-sm font-medium text-gray-700">入组中医病种Top20明细</h4>} headers={['病种编码及名称', '人次', '总费用', '总分值', '测算结余情况']} rows={filteredTable4Data} pageSize={10} showDownload downloadFilename="入组前20中医病种明细" />
           </div>
         </div>
       </Card>
@@ -432,7 +419,7 @@ export function Overview() {
               onClick={() => setScatterDimension('department')}
               className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${scatterDimension === 'department' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}
             >
-              Top20科室
+              全部科室
             </button>
             <button
               onClick={() => setScatterDimension('comprehensive')}
